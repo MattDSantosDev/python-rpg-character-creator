@@ -4,7 +4,7 @@ import os
 import pdfplumber
 import pytesseract
 from functions import *
-from pypdf import PdfReader
+from PyPDF2 import PdfReader
 
 
 # Set page configuration
@@ -97,7 +97,7 @@ if rpg_system == "D&D":
 
     if character_class != "" and character_class != "Selecione sua classe de personagem:":
         st.write(f"Você selecionou: {character_class}\n")
-        search_term = character_class
+        search_term = character_class.lower()
         st.write(f"Essa é a tabela de traços da classe escolhida:")
 
         # Extract and display the basic traits table

@@ -92,17 +92,17 @@ if rpg_system == "D&D":
     if character_class != "" and character_class != "Selecione sua classe de personagem:":
         # Define a mapping of character classes to their corresponding files
         class_to_file_map = {
-            "Bárbaro": "assets/D&D_Barbaro.pdf",
-            "Bardo": "assets/D&D_Bardo.pdf",
-            "Clérigo": "assets/D&D_Clerigo.pdf",
-            "Druida": "assets/D&D_Druida.pdf",
-            "Feiticeiro": "assets/D&D_Feiticeiro.pdf",
-            "Guardião": "assets/D&D_Guardiao.pdf",
-            "Guerreiro": "assets/D&D_Guerreiro.pdf",
-            "Ladrão": "assets/D&D_Ladrao.pdf",
-            "Mago": "assets/D&D_Mago.pdf",
-            "Monge": "assets/D&D_Monge.pdf",
-            "Paladino": "assets/D&D_Paladino.pdf"
+            "Bárbaro": "assets/D&D-Barbaro.pdf",
+            "Bardo": "assets/D&D-Bardo.pdf",
+            "Clérigo": "assets/D&D-Clerigo.pdf",
+            "Druida": "assets/D&D-Druida.pdf",
+            "Feiticeiro": "assets/D&D-Feiticeiro.pdf",
+            "Guardião": "assets/D&D-Guardiao.pdf",
+            "Guerreiro": "assets/D&D-Guerreiro.pdf",
+            "Ladrão": "assets/D&D-Ladino.pdf",
+            "Mago": "assets/D&D-Mago.pdf",
+            "Monge": "assets/D&D-Monge.pdf",
+            "Paladino": "assets/D&D-Paladino.pdf"
         }
 
         if character_class in class_to_file_map:
@@ -121,43 +121,6 @@ if rpg_system == "D&D":
             else:
                 st.write("Tabela de traços não encontrada.")
 
-    '''# Process files
-    for file_path in files_to_process:
-        st.write(f"Processing file: {file_path}")
-
-            st.write("Extracting text from PDF...")
-            with pdfplumber.open(file_path) as pdf:
-                for page in pdf.pages:
-                    text = page.extract_text()
-                    st.write(text)
-
-# Example usage
-if rpg_system == "D&D":
-    search_term = st.text_input("Enter a term to search in bookmarks:")
-    if search_term:
-        results = search_with_bookmarks("assets/D&D.pdf", search_term)
-        for title, page in results:
-            st.write(f"Found '{search_term}' in bookmark '{title}' on page {page}")
-
-    search_term = st.text_input("Enter a term to search in headers:")
-    if search_term:
-        header_results = search_with_headers("assets/D&D.pdf", search_term)
-        for header, page in header_results:
-            st.write(f"Found '{search_term}' in header '{header}' on page {page}")
-
-    process_dd_files() 
-
-# Extract tables from D&D.pdf and display to the user
-if rpg_system == "D&D":
-    st.write("Extracting tables from D&D.pdf...")
-
-    with pdfplumber.open("assets/D&D.pdf") as pdf:
-        for page_number, page in enumerate(pdf.pages):
-            tables = page.extract_tables()
-            if tables:
-                st.write(f"Tables found on page {page_number + 1}:")
-                for table in tables:
-                    st.write(table)'''
 
 # Entry point for the Python RPG Character Creator
 

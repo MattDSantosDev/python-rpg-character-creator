@@ -81,39 +81,21 @@ def search_with_headers(pdf_path, search_term):
 
 # Basic Traits Table Extraction
 def basic_traits_table_extraction(pdf_path, search_term):
-    reader = PdfReader(pdf_path)
-    header_page = search_with_headers(pdf_path, search_term)
-    
-    # Fixed `header_page` usage
-    if header_page is None:
-        return None  # Return None if no header page is found
-    class_page = header_page + 1
-    
-    # Updated `basic_traits_table_extraction` to extract table from the next page
-    if header_page:
-        with pdfplumber.open(pdf_path) as pdf:
-            next_page = header_page  # Use the next page after the header
-            page = pdf.pages[next_page]
-            tables = page.extract_tables()
+    with pdfplumber.open(pdf_path) as pdf:
+        # Extract the first page
+        first_page = pdf.pages[0]
 
-            # Use OCR if no tables are found
-            if not tables:
-                image = page.to_image()  # Convert page to image
-                # Fixed image compatibility for OCR
-                pil_image = image.original  # Access the original Pillow image object
-                ocr_text = pytesseract.image_to_string(pil_image)
-                return parse_table_from_ocr(ocr_text)
+        # Attempt to extract tables directly
+        tables = first_page.extract_tables()
 
-            return tables[0]  # Return the first table
-    return None  # Return None if no tables are found
+        # Use OCR if no tables are found
+        if not tables:
+            image = first_page.to_image()
+            pil_image = image.original  # Access the original Pillow image object
+            ocr_text = pytesseract.image_to_string(pil_image)
 
-# Added `parse_table_from_ocr` function
+            # Parse OCR text into a table format (basic implementation)
+            rows = ocr_text.split("\n")
+            tables = [row.split() for row in rows if row.strip()]  # Split rows into columns
 
-def parse_table_from_ocr(ocr_text):
-    # Example logic to parse table-like data from OCR text
-    rows = ocr_text.split("\n")  # Split text into rows
-    table = []
-    for row in rows:
-        columns = row.split()  # Split row into columns (customize as needed)
-        table.append(columns)
-    return table
+        return tables

@@ -82,11 +82,6 @@ if rpg_system != "Escolha qual sistema quer usar:" and rpg_system != "":
 if rpg_system == "D&D":
     st.write("Vamos começar a criar esse personagem de D&D!")
 
-    # Define file paths
-    files_to_process = [
-        "assets/D&D.pdf"
-    ]
-
     # Class selection
     character_class = st.selectbox(
         "Selecione sua classe de personagem:",
@@ -95,21 +90,36 @@ if rpg_system == "D&D":
     )
 
     if character_class != "" and character_class != "Selecione sua classe de personagem:":
-        st.write(f"Você selecionou: {character_class}\n")
-        search_term = character_class.lower()
-        st.write(f"Essa é a tabela de traços da classe escolhida:")
+        # Define a mapping of character classes to their corresponding files
+        class_to_file_map = {
+            "Bárbaro": "assets/D&D_Barbaro.pdf",
+            "Bardo": "assets/D&D_Bardo.pdf",
+            "Clérigo": "assets/D&D_Clerigo.pdf",
+            "Druida": "assets/D&D_Druida.pdf",
+            "Feiticeiro": "assets/D&D_Feiticeiro.pdf",
+            "Guardião": "assets/D&D_Guardiao.pdf",
+            "Guerreiro": "assets/D&D_Guerreiro.pdf",
+            "Ladrão": "assets/D&D_Ladrao.pdf",
+            "Mago": "assets/D&D_Mago.pdf",
+            "Monge": "assets/D&D_Monge.pdf",
+            "Paladino": "assets/D&D_Paladino.pdf"
+        }
 
-        # Extract and display the basic traits table
-        traits_table = basic_traits_table_extraction("assets/D&D.pdf", search_term)
-        if traits_table:
-            for row in traits_table:
-                st.write(row)
-        else:
-            st.write("Tabela de traços não encontrada.")
+        if character_class in class_to_file_map:
+            # Get the file corresponding to the selected class
+            file_to_process = class_to_file_map[character_class]
 
-    # Origin Selection
-    
+            st.write(f"Você selecionou: {character_class}\n")
+            search_term = character_class.lower()
+            st.write(f"Essa é a tabela de traços da classe escolhida:")
 
+            # Extract and display the basic traits table
+            traits_table = basic_traits_table_extraction(file_to_process, search_term)
+            if traits_table:
+                for row in traits_table:
+                    st.write(row)
+            else:
+                st.write("Tabela de traços não encontrada.")
 
     '''# Process files
     for file_path in files_to_process:

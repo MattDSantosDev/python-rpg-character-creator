@@ -19,33 +19,6 @@ def search_with_bookmarks(pdf_path, search_term):
             results.append((bookmark.title, page_number + 1))
     return results
 
-# Functionality to process D&D files
-def process_dd_files():
-    st.write("Preparing to process D&D files...")
-
-    # Define file paths
-    files_to_process = [
-        "assets/D&D.pdf",
-        "assets/D&D Tasha.pdf",
-        "assets/D&D Xanathar.pdf"
-    ]
-
-    # Process files
-    for file_path in files_to_process:
-        st.write(f"Processing file: {file_path}")
-
-        if file_path == "assets/D&D Tasha.pdf":
-            st.write("Performing OCR on D&D Tasha.pdf...")
-            with pdfplumber.open(file_path) as pdf:
-                for page in pdf.pages:
-                    text = pytesseract.image_to_string(page.to_image())
-                    st.write(text)
-        else:
-            st.write("Extracting text from PDF...")
-            with pdfplumber.open(file_path) as pdf:
-                for page in pdf.pages:
-                    text = page.extract_text()
-                    st.write(text)
 
 # Functionality to use PDF headers/titles as a search method
 def search_with_headers(pdf_path, search_term):
@@ -62,3 +35,22 @@ def search_with_headers(pdf_path, search_term):
                 results.append((header, page_number + 1))
     return results
 
+# Basic Traits Table Extraction
+def basic_traits_table_extraction(pdf_path, search_term):
+    reader = PdfReader(pdf_path)
+    bookmark_page = search_with_bookmarks(pdf_path, search_term)
+    class_page = bookmark_page[0]
+    
+    with pdfplumber.open(pdf_path) as pdf:
+        # Access the specific page using the bookmark_page variable
+        page = pdf.pages[class_page[1] - 1]  # Subtract 1 because page numbers are zero-indexed in pdfplumber
+        
+        # Extract tables from the page
+        tables = page.extract_tables()
+        
+        # Check if tables exist and extract the first one
+        if tables:
+            first_table = tables[0]
+            return first_table
+        else:
+            return None

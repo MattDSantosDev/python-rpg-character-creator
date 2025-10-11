@@ -6,7 +6,6 @@ import pytesseract
 from functions import *
 from PyPDF2 import PdfReader
 
-
 # Set page configuration
 st.set_page_config(
     page_title="RPG Character Creator",
@@ -112,6 +111,44 @@ if rpg_system == "D&D":
     
 
 
+    '''# Process files
+    for file_path in files_to_process:
+        st.write(f"Processing file: {file_path}")
+
+            st.write("Extracting text from PDF...")
+            with pdfplumber.open(file_path) as pdf:
+                for page in pdf.pages:
+                    text = page.extract_text()
+                    st.write(text)
+
+# Example usage
+if rpg_system == "D&D":
+    search_term = st.text_input("Enter a term to search in bookmarks:")
+    if search_term:
+        results = search_with_bookmarks("assets/D&D.pdf", search_term)
+        for title, page in results:
+            st.write(f"Found '{search_term}' in bookmark '{title}' on page {page}")
+
+    search_term = st.text_input("Enter a term to search in headers:")
+    if search_term:
+        header_results = search_with_headers("assets/D&D.pdf", search_term)
+        for header, page in header_results:
+            st.write(f"Found '{search_term}' in header '{header}' on page {page}")
+
+    process_dd_files() 
+
+# Extract tables from D&D.pdf and display to the user
+if rpg_system == "D&D":
+    st.write("Extracting tables from D&D.pdf...")
+
+    with pdfplumber.open("assets/D&D.pdf") as pdf:
+        for page_number, page in enumerate(pdf.pages):
+            tables = page.extract_tables()
+            if tables:
+                st.write(f"Tables found on page {page_number + 1}:")
+                for table in tables:
+                    st.write(table)'''
+
 # Entry point for the Python RPG Character Creator
 
 def main():
@@ -119,3 +156,11 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# Example usage of pdfplumber and pytesseract
+# This is a placeholder for future functionality
+# You can use pdfplumber to extract text from PDFs and pytesseract for OCR tasks
+
+# Example usage of pypdf
+# This is a placeholder for future functionality
+# You can use PdfReader to extract text from PDFs

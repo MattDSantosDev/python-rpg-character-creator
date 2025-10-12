@@ -1,0 +1,3 @@
+ '''# Extract and display the basic traits table
+            traits_table = basic_traits_table_extraction(file_to_process, search_term)
+            st.write("Debugging traits_table:", traits_table)'''

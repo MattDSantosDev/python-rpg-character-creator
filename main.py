@@ -3,8 +3,12 @@ import base64
 import os
 import pdfplumber
 import pytesseract
+import pandas as pd
 from functions import *
 from PyPDF2 import PdfReader
+from dndfunctions import *
+#from opfunctions import *
+
 
 # Set page configuration
 st.set_page_config(
@@ -13,56 +17,27 @@ st.set_page_config(
     layout="wide"
 )
 
-# Function to load and encode local image
-def get_base64_image(image_path):
-    if os.path.exists(image_path):
-        with open(image_path, "rb") as img_file:
-            return base64.b64encode(img_file.read()).decode()
-    return None
+# Remove image background and replace it with dark grey color
+page_bg_img = '''
+<style>
+.stApp {
+    background-color: #2E2E2E;
+}
 
-# Load the brick wall background image
-bg_image_path = "assets/brick_wall.jpg"  # Update this with your actual image filename
-bg_image_base64 = get_base64_image(bg_image_path)
+.main .block-container {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 2rem;
+    margin-top: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+</style>
+'''
 
-# Apply custom background with local image
-if bg_image_base64:
-    page_bg_img = f'''
-    <style>
-    .stApp {{
-        background-image: url("data:image/jpeg;base64,{bg_image_base64}");
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        background-position: center;
-    }}
-    
-    .main .block-container {{
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 10px;
-        padding: 2rem;
-        margin-top: 2rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }}
-    </style>
-    '''
-else:
-    # Fallback CSS background if image not found
-    page_bg_img = '''
-    <style>
-    .stApp {
-        background: linear-gradient(135deg, #c4714b 0%, #a8613e 25%, #b56a45 50%, #9e5937 75%, #c4714b 100%);
-    }
-    
-    .main .block-container {
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 10px;
-        padding: 2rem;
-        margin-top: 2rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    </style>
-    '''
 st.markdown(page_bg_img, unsafe_allow_html=True)
+
+# Custom CSS to make text stand out
+st.markdown("<style>body { color: white; background-color: #2E2E2E; }</style>", unsafe_allow_html=True)
 
 # Main content
 st.title("Bem-vindo ao Criador de Personagens RPG!")
@@ -82,44 +57,7 @@ if rpg_system != "Escolha qual sistema quer usar:" and rpg_system != "":
 if rpg_system == "D&D":
     st.write("Vamos começar a criar esse personagem de D&D!")
 
-    # Class selection
-    character_class = st.selectbox(
-        "Selecione sua classe de personagem:",
-        ["", "Bárbaro", "Bardo", "Clérigo", "Druida", "Feiticeiro", "Guardião", "Guerreiro", "Ladrão", "Mago",
-         "Monge", "Paladino"]
-    )
-
-    if character_class != "" and character_class != "Selecione sua classe de personagem:":
-        # Define a mapping of character classes to their corresponding files
-        class_to_file_map = {
-            "Bárbaro": "assets/D&D-Barbaro.pdf",
-            "Bardo": "assets/D&D-Bardo.pdf",
-            "Clérigo": "assets/D&D-Clerigo.pdf",
-            "Druida": "assets/D&D-Druida.pdf",
-            "Feiticeiro": "assets/D&D-Feiticeiro.pdf",
-            "Guardião": "assets/D&D-Guardiao.pdf",
-            "Guerreiro": "assets/D&D-Guerreiro.pdf",
-            "Ladrão": "assets/D&D-Ladino.pdf",
-            "Mago": "assets/D&D-Mago.pdf",
-            "Monge": "assets/D&D-Monge.pdf",
-            "Paladino": "assets/D&D-Paladino.pdf"
-        }
-
-        if character_class in class_to_file_map:
-            # Get the file corresponding to the selected class
-            file_to_process = class_to_file_map[character_class]
-
-            st.write(f"Você selecionou: {character_class}\n")
-            search_term = character_class.lower()
-            st.write(f"Essa é a tabela de traços da classe escolhida:")
-
-            # Extract and display the basic traits table
-            traits_table = basic_traits_table_extraction(file_to_process, search_term)
-            if traits_table:
-                for row in traits_table:
-                    st.write(row)
-            else:
-                st.write("Tabela de traços não encontrada.")
+    
 
 
 # Entry point for the Python RPG Character Creator

@@ -57,7 +57,8 @@ if rpg_system != "Escolha qual sistema quer usar:" and rpg_system != "":
 if rpg_system == "D&D":
     st.write("Vamos começar a criar esse personagem de D&D!")
 
-    
+    # Call the D&D class chooser and capture the returned values
+    choose_dnd_class()
 
 
 # Entry point for the Python RPG Character Creator

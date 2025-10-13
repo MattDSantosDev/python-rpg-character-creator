@@ -1,5 +1,7 @@
 # Python RPG Character Creator
 
+[![CI](https://github.com/MattDSantosDev/python-rpg-character-creator/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/MattDSantosDev/python-rpg-character-creator/actions/workflows/test.yml)
+
 This project is a Python-based application for creating RPG characters. It allows users to customize attributes, abilities, and more.
 
 ## Frontend

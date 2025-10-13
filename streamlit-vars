@@ -1,0 +1,58 @@
+Streamlit variables catalog
+===========================
+
+This file lists Streamlit-facing variables (widgets, session_state keys, and important UI items)
+used by the project, with a short description and where they are defined.
+
+- rpg_system
+  - Location: `main.py`
+  - Widget: st.selectbox
+  - Description: top-level selector for the RPG system. Options: ["", "D&D", "Ordem Paranormal"].
+  - Default/initial: empty string ("")
+  - Notes: used to choose which UI branch to render (D&D vs Ordem Paranormal).
+
+- character_class
+  - Location: `dndfunctions.py` (choose_dnd_class)
+  - Widget: st.selectbox
+  - Description: D&D class selector (Portuguese names). Options include "Bárbaro", "Bardo", etc.
+  - Default/initial: empty string (if nothing selected); helper returns (None, class_to_file_map) when no selection.
+  - Notes: used to look up the PDF in `class_to_file_map` and trigger table extraction.
+
+- formatted_table (display variable)
+  - Location: `dndfunctions.py` (choose_dnd_class)
+  - Widget: st.dataframe inside st.expander
+  - Description: pandas DataFrame assembled from the extracted traits table. Shown to the user in an expander.
+  - Notes: not a Streamlit control value, but the display output of `basic_traits_table_extraction` processing.
+
+- st.session_state keys: box_0 .. box_{n-1}
+  - Location: `opfunctions.py` (atts_selector)
+  - Widget: represented via two buttons and a value display (− button, value, + button)
+  - Description: integer attribute values the user can increment/decrement for each column.
+  - Default/initial: each `box_i` is initialized to 1 when first created.
+  - Range / constraints: enforced by `atts_selector` through `min_value` / `max_value` parameters (defaults 0..5 in the helper). Use `atts_selector(num_attributes, min_value, max_value)` to configure.
+  - Notes: values persist in Streamlit session state across reruns.
+
+- UI button keys: dec_0 .. dec_{n-1} and inc_0 .. inc_{n-1}
+  - Location: `opfunctions.py` (atts_selector)
+  - Widget: st.button
+  - Description: per-column decrease/increase buttons. They trigger callbacks that update the corresponding `box_i` session_state value.
+  - Notes: buttons themselves do not hold values; they must have unique keys so Streamlit can track separate controls.
+
+- page_bg_img (CSS string)
+  - Location: `main.py`
+  - Widget: passed to st.markdown(unsafe_allow_html=True)
+  - Description: CSS that sets the app background color and main block styling. Not a widget value but affects UI visibility/layout.
+
+- st.set_page_config parameters
+  - Location: `main.py`
+  - Widget: page configuration
+  - Description: page_title = "RPG Character Creator", page_icon = "⚔️", layout = "wide".
+  - Notes: called once at app startup; not a stateful variable.
+
+Notes / Guidelines
+- Keys: prefer unique keys for all interactive controls. The code uses `box_{i}`, `dec_{i}`, `inc_{i}` for the attribute selector.
+- Session state initialization: all `box_*` keys are initialized to 1 only if the key is not present; this preserves user changes across reruns.
+- Visibility: some UI elements currently use small buttons + plain text display (the attribute boxes). If you expect visible numeric inputs, use `st.number_input` instead — it supports per-widget `min_value`/`max_value` directly.
+- OCR/CI flag: the environment variable `SKIP_OCR` (not a Streamlit variable) controls whether OCR fallbacks run in `dndfunctions.py`.
+
+If you want this catalog expanded to include every session_state key at runtime, I can add a small debug endpoint that prints `dict(st.session_state)` and generate the file automatically.

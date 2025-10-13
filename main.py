@@ -31,6 +31,10 @@ page_bg_img = '''
     margin-top: 2rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+/* tighten streamlit button padding for a tighter layout */
+button[data-baseweb="button"] {
+    padding: 6px 8px !important;
+}
 </style>
 '''
 
@@ -62,7 +66,7 @@ if rpg_system == "D&D":
 
 elif rpg_system == "Ordem Paranormal":
     st.write("Vamos começar a criar esse personagem de Ordem Paranormal!")
-    atts_selector()
+    atts_selector(5, labels = ["Força", "Agilidade", "Intelecto", "Presença", "Vigor"])
 
 # Entry point for the Python RPG Character Creator
 

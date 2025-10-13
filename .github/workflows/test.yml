@@ -1,0 +1,62 @@
+name: Test extraction
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install system Tesseract
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y tesseract-ocr
+      - name: Export SKIP_OCR
+        run: |
+          echo "SKIP_OCR=0" >> $GITHUB_ENV
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install pytest
+      - name: Run pytest
+        run: |
+          pytest -q
+
+  test-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Try to install Tesseract (optional)
+        run: |
+          choco install -y tesseract -y || echo "choco not available or install failed; continuing without system Tesseract"
+      - name: Detect Tesseract and set SKIP_OCR
+        shell: powershell
+        run: |
+          $found = Get-Command tesseract -ErrorAction SilentlyContinue
+          if ($null -eq $found) {
+            Write-Host "Tesseract not found on PATH - setting SKIP_OCR=1"
+            echo "SKIP_OCR=1" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          } else {
+            echo "SKIP_OCR=0" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          }
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install pytest
+      - name: Run pytest
+        run: |
+          pytest -q

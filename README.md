@@ -47,3 +47,36 @@ This project includes various assets to support RPG character creation:
 | `OP Ficha.pdf` | Character sheet for Ordem Paranormal |
 | `OP Poderes e Rituais.pdf` | Powers and rituals reference for Ordem Paranormal |
 | `OP Sobrevivendo ao Horror.pdf` | Surviving horror guide for Ordem Paranormal |
+
+## Run & Test (Windows PowerShell)
+
+Install dependencies into the repository virtualenv (or your preferred environment):
+
+```powershell
+# from project root
+.
+# create venv if needed
+python -m venv .venv
+& .\.venv\Scripts\python.exe -m pip install --upgrade pip
+& .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
+
+Run the Streamlit UI:
+
+```powershell
+& .\.venv\Scripts\python.exe -m streamlit run main.py
+```
+
+Run the parser test script (fast reproduction of table extraction):
+
+```powershell
+& .\.venv\Scripts\python.exe .\scripts\test_extract.py
+```
+
+Tesseract (OCR) dependency
+- The project uses `pytesseract` for OCR fallbacks. `pytesseract` is a Python wrapper and requires the Tesseract system binary (`tesseract`) to be installed and on PATH.
+- On Windows you can install it from: https://github.com/UB-Mannheim/tesseract/wiki or via Chocolatey: `choco install tesseract`
+- On Ubuntu: `sudo apt-get install tesseract-ocr`
+
+CI note
+- The included GitHub Actions workflow will attempt to install `tesseract-ocr` on the Ubuntu runner. On Windows the workflow will try to use Chocolatey but will still run even if system Tesseract is not available — OCR tests are skipped when the `SKIP_OCR` environment variable is set.

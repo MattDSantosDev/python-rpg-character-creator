@@ -1,5 +1,7 @@
+import os
 import pdfplumber
 import pytesseract
+import shutil
 import streamlit as st
 from PyPDF2 import PdfReader
 from PIL import Image
@@ -90,11 +92,15 @@ def basic_traits_table_extraction(pdf_path, search_term):
         if not tables:
             image = first_page.to_image()
             pil_image = image.original  # Access the original Pillow image object
-            ocr_text = pytesseract.image_to_string(pil_image)
+            if _ensure_tesseract():
+                ocr_text = pytesseract.image_to_string(pil_image)
 
-            # Parse OCR text into a table format (basic implementation)
-            rows = ocr_text.split("\n")
-            tables = [row.split() for row in rows if row.strip()]  # Split rows into columns
+                # Parse OCR text into a table format (basic implementation)
+                rows = ocr_text.split("\n")
+                tables = [row.split() for row in rows if row.strip()]  # Split rows into columns
+            else:
+                # Tesseract not available or intentionally skipped; return None so caller can handle
+                return None
 
         return tables
 
@@ -121,6 +127,10 @@ def extract_table_page_2(pdf_path, ocr_lang="por", ocr_resolution=300):
         # Use OCR if no tables are found
         image = second_page.to_image(resolution=ocr_resolution)
         pil_image = image.original  # Access the original Pillow image object
+        if not _ensure_tesseract():
+            # Can't run OCR on this runner; return None so the test/workflow can skip OCR-related checks
+            return None
+
         ocr_text = pytesseract.image_to_string(pil_image, lang=ocr_lang)
 
         # Split into lines and keep only non-empty lines
@@ -182,3 +192,16 @@ def extract_table_page_2(pdf_path, ocr_lang="por", ocr_resolution=300):
         # final fallback: split on 2+ spaces (common OCR column delimiter)
         rows = [re.split(r"\s{2,}", ln.strip()) for ln in lines]
         return rows if rows else None
+
+
+def _ensure_tesseract():
+    """Return True if the system tesseract binary is available.
+
+    Respects the environment variable `SKIP_OCR=1` which CI can set to explicitly
+    skip OCR tests on runners where system Tesseract is not available.
+    """
+    # Allow CI to explicitly opt-out
+    if os.environ.get("SKIP_OCR", "0") in ("1", "true", "True"):
+        return False
+
+    return shutil.which("tesseract") is not None

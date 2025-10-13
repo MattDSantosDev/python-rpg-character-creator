@@ -1,3 +1,15 @@
  '''# Extract and display the basic traits table
             traits_table = basic_traits_table_extraction(file_to_process, search_term)
             st.write("Debugging traits_table:", traits_table)'''
+
+'''if not tables or table_index >= len(tables):
+                return None, "Nenhuma tabela encontrada na segunda página."
+
+            # Convert the selected table to a DataFrame
+            selected_table = tables[table_index]
+            df = pd.DataFrame(selected_table)
+
+            return df, None
+
+    except Exception as e:
+        return None, str(e)'''

@@ -9,7 +9,8 @@ from pprint import pprint
 
 pdf = d.class_to_file_map.get('Bárbaro')
 print('Using PDF:', pdf)
-rows = d.extract_table_page_2(pdf, ncols=6, ocr_lang='por', ocr_resolution=300)
+# extract_table_page_2 signature: (pdf_path, ocr_lang='por', ocr_resolution=300)
+rows = d.extract_table_page_2(pdf, ocr_lang='por', ocr_resolution=300)
 if not rows:
     print('No rows extracted')
 else:

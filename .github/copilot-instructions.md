@@ -21,7 +21,7 @@ Project-specific patterns and conventions
 How to run locally (Windows PowerShell)
 - Install dependencies inferred from imports (no requirements.txt present):
 
-  pip install streamlit pdfplumber pytesseract PyPDF2 pillow pandas
+  pip install streamlit pdfplumber pytesseract pypdf pillow pandas
 
 - Run the UI:
 

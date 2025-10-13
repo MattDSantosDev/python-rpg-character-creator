@@ -5,9 +5,9 @@ import pdfplumber
 import pytesseract
 import pandas as pd
 from functions import *
-from PyPDF2 import PdfReader
+from pypdf import PdfReader
 from dndfunctions import *
-#from opfunctions import *
+from opfunctions import *
 
 
 # Set page configuration
@@ -60,6 +60,9 @@ if rpg_system == "D&D":
     # Call the D&D class chooser and capture the returned values
     choose_dnd_class()
 
+elif rpg_system == "Ordem Paranormal":
+    st.write("Vamos começar a criar esse personagem de Ordem Paranormal!")
+    atts_selector()
 
 # Entry point for the Python RPG Character Creator
 

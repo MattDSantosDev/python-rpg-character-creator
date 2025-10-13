@@ -5,6 +5,8 @@ import streamlit as st
 from pypdf import PdfReader
 from PIL import Image
 import pandas as pd
+import re
+from pathlib import Path
 
 # Functionality to use PDF bookmarks as a search range
 def search_with_bookmarks(pdf_path, search_term):
@@ -52,3 +54,30 @@ def search_with_headers(pdf_path, search_term):
                 return page_number + 1
     return None  # Return None if the header is not found
 
+def extract_headers_pypdf(pdf_path, header_regex=None):
+    pdf_path = Path(pdf_path)
+    reader = PdfReader(str(pdf_path))
+    header_candidates = []  # (page, line_text)
+    # a simple regex for header-like lines (customize)
+    if header_regex is None:
+        header_regex = re.compile(r'^[A-ZÀ-ÖØ-Ý0-9][A-Z0-9 \-]{2,}$')  # all-caps-ish heuristic
+
+    for pageno, page in enumerate(reader.pages, start=1):
+        text = page.extract_text() or ""
+        # split into non-empty lines
+        lines = [line.strip() for line in text.splitlines() if line.strip()]
+        for idx, line in enumerate(lines):
+            # primary heuristic: matches regex (all-caps/short-ish)
+            if header_regex.match(line):
+                header_candidates.append((pageno, line))
+            # secondary heuristic: line ends with ":" or followed by lines that look like table rows
+            elif line.endswith(":"):
+                header_candidates.append((pageno, line.rstrip(":").strip()))
+            else:
+                # look ahead: if next lines contain many separators or multiple tokens per line, it's likely a header above a table
+                if idx + 1 < len(lines):
+                    next_line = lines[idx + 1]
+                    if len(next_line.split()) >= 3 and any(c.isdigit() for c in next_line):
+                        # heuristic: next line looks tabular (has numbers)
+                        header_candidates.append((pageno, line))
+    return header_candidates

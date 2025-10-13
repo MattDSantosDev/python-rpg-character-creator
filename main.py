@@ -85,9 +85,11 @@ if rpg_system == "D&D":
 
 elif rpg_system == "Ordem Paranormal":
     st.write("Vamos começar a criar esse personagem de Ordem Paranormal!\n")
-    nex_selector()
-    atts_selector(5, labels = ["Força", "Agilidade", "Intelecto", "Presença", "Vigor"])
-    select_origin()
+    nex_value = nex_selector()
+    if nex_value and nex_value != "":        # only proceed if user selected something
+        # render attributes only once and proceed to origin selection
+        attrs = atts_selector(5, labels=["Força", "Agilidade", "Intelecto", "Presença", "Vigor"])
+        select_origin()
 
 # Entry point for the Python RPG Character Creator
 

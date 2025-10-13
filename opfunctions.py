@@ -8,15 +8,37 @@ import re
 from typing import Optional, Sequence
 from functools import partial
 from functions import *
+import json
 
+try:
+    # use utf-8-sig to gracefully handle files that include a UTF-8 BOM
+    with open("data/lists.json", "r", encoding="utf-8-sig") as f:
+        data = json.load(f)
+except Exception as e:
+    # provide a friendly error so Streamlit shows a clear message in the app logs
+    raise RuntimeError(f"Failed to load data/lists.json: {e}") from e
+
+lists = list(data.keys())
 
 def select_origin():
-    #Passo 3
-    pdf_paths = ["assets/OP-Origens.pdf","assets/OP-SaH-Origens.pdf"]
-    origin = st.selectbox(
-        "Selecione a origem do seu personagem:",
-        [""] + pdf_paths
-    )
+    """Render a selectbox for Ordem Paranormal origins and return the selection.
+
+    This function reads the preloaded `data` dict (loaded at module import) and
+    looks for the key `op_origins`. If not found it shows a friendly Streamlit
+    error message.
+    """
+    # prefer the OP origins key which is used by the project data file
+    options = []
+    if isinstance(data, dict):
+        options = data.get("op_origins") or []
+
+    if not options:
+        st.error("Nenhuma origem disponível. Verifique `data/lists.json` e a chave 'op_origins'.")
+        return None
+
+    # show an empty option first so the user must actively choose
+    origin = st.selectbox("Selecione a origem do seu personagem:", [""] + options, index=0)
+    return origin
 
 '''def select_class():
     #Passo 4
@@ -31,6 +53,7 @@ def nex_increase():
     #Passo 7'''
 
 def nex_selector():
+    # Passo 1
     # place the selectbox in a centered column so it visually appears narrow
     col1, col2, col3 = st.columns([1, 2, 1])
     with col1:
@@ -43,8 +66,11 @@ def nex_selector():
             st.write("Valor máximo para atributos = 4")
         elif nex_value >= "50%" and nex_value < "80%":
             st.write("Valor máximo para atributos = 5")
+    # Return the selected NEX value so callers can decide whether to continue
+    return nex_value
 
 def atts_selector(num_attributes: int = 5, min_value: int = 0, max_value: int = 5, labels: Optional[Sequence[str]] = None) -> Sequence[int]:
+    # Passo 2
     """Render N attribute columns and return their integer values.
 
     Args:

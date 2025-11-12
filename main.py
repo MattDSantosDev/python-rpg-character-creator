@@ -1,4 +1,6 @@
 import streamlit as st
+import streamlit.components.v1 as components
+import urllib.parse as up
 import base64
 import os
 import pdfplumber
@@ -8,6 +10,17 @@ from functions import *
 from pypdf import PdfReader
 from dndfunctions import *
 from opfunctions import *
+import runpy
+
+
+# Define page navigation functions at module level
+def _go_dnd():
+    print("DEBUG: _go_dnd callback called")
+    st.session_state.navigate_to = "pages/01_DnD.py"
+
+def _go_op():
+    print("DEBUG: _go_op callback called") 
+    st.session_state.navigate_to = "pages/02_OrdemParanormal.py"
 
 
 # Set page configuration
@@ -66,30 +79,49 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# place the selectbox in a centered column so it visually appears narrow
+# place system choice as buttons and use query params for shareable navigation
+# ensure session key exists
+if 'selected_system' not in st.session_state:
+    st.session_state['selected_system'] = None
+
 col1, col2, col3 = st.columns([1, 2, 1])
-with col1:
+with col2:
     st.markdown('<div class="narrow-selectbox">', unsafe_allow_html=True)
-    rpg_system = st.selectbox(
-        "Escolha qual sistema quer usar:",
-        ["", "D&D", "Ordem Paranormal"]
-    )
+    st.write('Escolha qual sistema quer usar:')
+    
+    # Style Streamlit buttons with centered positioning
+    st.markdown('''
+    <style>
+    .stButton>button {
+        background-color: #6b6b6b !important;
+        color: white !important;
+        border-radius: 6px;
+        padding: 8px 14px;
+        font-weight: 600;
+        width: 100% !important;
+    }
+    .stButton>button:hover { opacity: 0.9; }
+    </style>
+    ''', unsafe_allow_html=True)
+
+    # Center the buttons in columns
+    col_a, col_b = st.columns(2)
+    with col_a:
+        st.button('Abrir D&D', on_click=_go_dnd, key='btn_dnd')
+    with col_b:
+        st.button('Abrir Ordem Paranormal', on_click=_go_op, key='btn_op')
+
     st.markdown('</div>', unsafe_allow_html=True)
 
-# Handle file processing based on dropdown selection
-if rpg_system == "D&D":
-    st.write("Vamos começar a criar esse personagem de D&D!\n")
+    # Handle navigation after button clicks using session state
+    if 'navigate_to' in st.session_state and st.session_state.navigate_to:
+        page_to_navigate = st.session_state.navigate_to
+        st.session_state.navigate_to = None  # Clear the flag
+        st.switch_page(page_to_navigate)
 
-    # Call the D&D class chooser and capture the returned values
-    choose_dnd_class()
-
-elif rpg_system == "Ordem Paranormal":
-    st.write("Vamos começar a criar esse personagem de Ordem Paranormal!\n")
-    nex_value = nex_selector()
-    if nex_value and nex_value != "":        # only proceed if user selected something
-        # render attributes only once and proceed to origin selection
-        attrs = atts_selector(5, labels=["Força", "Agilidade", "Intelecto", "Presença", "Vigor"])
-        select_origin()
+# Note: navigation to pages is handled by Streamlit when the browser navigates to
+# the page route (e.g. /DnD or /OrdemParanormal). We avoid executing page scripts
+# from main so the landing page content is not shown together with a page.
 
 # Entry point for the Python RPG Character Creator
 

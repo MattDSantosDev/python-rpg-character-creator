@@ -12,6 +12,17 @@ from dndfunctions import *
 from opfunctions import *
 import runpy
 
+# Hide specific pages from the Streamlit sidebar (keeps files in repo but not listed)
+try:
+    pages = st.experimental_get_pages()
+    # Filter out any page whose source path ends with the given filename
+    filtered = {k: v for k, v in pages.items() if not getattr(v, 'path', k).endswith('pages/OP_Origem.py')}
+    if len(filtered) != len(pages):
+        st.experimental_set_pages(filtered)
+except Exception:
+    # experimental_get_pages may not be available in older Streamlit versions
+    pass
+
 
 # Define page navigation functions at module level
 def _go_dnd():
@@ -27,7 +38,8 @@ def _go_op():
 st.set_page_config(
     page_title="RPG Character Creator",
     page_icon="⚔️",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="collapsed",
 )
 
 # Remove image background and replace it with dark grey color
@@ -56,9 +68,64 @@ st.markdown(page_bg_img, unsafe_allow_html=True)
 # Custom CSS to make text stand out
 st.markdown("<style>body { color: white; background-color: #2E2E2E; }</style>", unsafe_allow_html=True)
 
-# Main content
-st.title("Bem-vindo ao Criador de Personagens RPG!")
-st.write("Crie seu próprio personagem de RPG com atributos e habilidades personalizáveis.")
+# Hide the Streamlit left sidebar visually across pages
+st.markdown(
+    """
+    <style>
+    div[data-testid="stSidebar"] { display: none !important; }
+    button[aria-label="Toggle sidebar"] { display: none !important; }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Also remove the sidebar node using a small JS snippet (components.html) to be robust
+try:
+    components.html(
+        """
+        <script>
+        (function(){
+            const selectors = ['div[data-testid="stSidebar"]', 'div[data-testid="stSidebarNav"]', 'aside', 'section[role="complementary"]'];
+            for (const sel of selectors) {
+                const el = document.querySelector(sel);
+                if (el) { el.remove(); }
+            }
+            const toggles = document.querySelectorAll('button[aria-label="Toggle sidebar"], button[title="Toggle sidebar"]');
+            toggles.forEach(t => t.remove());
+        })();
+        </script>
+        """,
+        height=0,
+    )
+except Exception:
+    # components.html may not work in some environments; CSS fallback remains
+    pass
+
+# Expand the main content container so columns can use full browser width
+st.markdown(
+    """
+    <style>
+    .main .block-container {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding-left: 2.5rem !important;
+        padding-right: 2.5rem !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Main content (centered)
+st.markdown(
+    """
+    <div style='text-align:center'>
+        <h1>Bem-vindo ao Criador de Personagens RPG!</h1>
+        <p>Crie seu próprio personagem de RPG com atributos e habilidades personalizáveis.</p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 # Add a dropdown menu for RPG systems inside a centered, narrow column
 st.markdown(
@@ -107,8 +174,10 @@ with col2:
     # Center the buttons in columns
     col_a, col_b = st.columns(2)
     with col_a:
+        # Opens DnD Character Creator page
         st.button('Abrir D&D', on_click=_go_dnd, key='btn_dnd')
     with col_b:
+        # Opens Ordem Paranormal Character Creator page
         st.button('Abrir Ordem Paranormal', on_click=_go_op, key='btn_op')
 
     st.markdown('</div>', unsafe_allow_html=True)
@@ -117,6 +186,17 @@ with col2:
     if 'navigate_to' in st.session_state and st.session_state.navigate_to:
         page_to_navigate = st.session_state.navigate_to
         st.session_state.navigate_to = None  # Clear the flag
+        try:
+            pages = st.experimental_get_pages()
+            # If a file path (endswith .py) was stored, try to find the registered page key
+            if isinstance(page_to_navigate, str) and page_to_navigate.endswith('.py'):
+                for key, page in pages.items():
+                    if getattr(page, 'path', '').endswith(page_to_navigate):
+                        page_to_navigate = key
+                        break
+        except Exception:
+            # experimental_get_pages may not exist on older Streamlit versions
+            pass
         st.switch_page(page_to_navigate)
 
 # Note: navigation to pages is handled by Streamlit when the browser navigates to
@@ -130,11 +210,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# Example usage of pdfplumber and pytesseract
-# This is a placeholder for future functionality
-# You can use pdfplumber to extract text from PDFs and pytesseract for OCR tasks
-
-# Example usage of pypdf
-# This is a placeholder for future functionality
-# You can use PdfReader to extract text from PDFs

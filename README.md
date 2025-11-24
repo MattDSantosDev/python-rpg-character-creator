@@ -82,3 +82,18 @@ Tesseract (OCR) dependency
 
 CI note
 - The included GitHub Actions workflow will attempt to install `tesseract-ocr` on the Ubuntu runner. On Windows the workflow will try to use Chocolatey but will still run even if system Tesseract is not available — OCR tests are skipped when the `SKIP_OCR` environment variable is set.
+
+## VS Code: auto-activate project virtualenv in integrated terminal
+
+This workspace includes a VS Code settings file that attempts to automatically activate the project's virtual environment when you open a new integrated terminal.
+
+- To use it: open this project in VS Code and select **Terminal → New Terminal**. The new PowerShell terminal should run `.\.venv\Scripts\Activate.ps1` and show the `(.venv)` prompt.
+- If you use PowerShell Core (`pwsh`) instead of Windows PowerShell, update the workspace profile in `.vscode/settings.json` to point to the `pwsh` executable (for example `C:\\Program Files\\PowerShell\\7\\pwsh.exe`).
+- To revert this behavior, remove or edit `.vscode/settings.json` in the project root.
+
+If the terminal doesn't activate the venv automatically, you can activate it manually:
+
+```powershell
+# from project root
+& .\.venv\Scripts\Activate.ps1
+```
